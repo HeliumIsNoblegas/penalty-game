@@ -1,0 +1,502 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Pretendard, Inter, Arial, sans-serif;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+button {
+  font-family: inherit;
+}
+
+.page {
+  min-height: 100vh;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  background: #ffffff;
+}
+
+/* 전체 레이아웃 */
+
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 430px;
+  gap: 24px;
+  align-items: start;
+}
+
+.stadium-card,
+.side-panel > div {
+  border-radius: 32px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+/* 경기장 상단 */
+
+.stadium-top {
+  height: 58px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #020617;
+  color: white;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ef4444;
+  box-shadow: 0 0 0 7px rgba(239, 68, 68, 0.18);
+}
+
+/* 경기장 */
+
+.field {
+  position: relative;
+  height: 560px;
+  overflow: hidden;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08) 50%, transparent 50%),
+    repeating-linear-gradient(
+      90deg,
+      #15803d 0,
+      #15803d 82px,
+      #16a34a 82px,
+      #16a34a 164px
+    );
+  background-size: 164px 100%;
+}
+
+.field::before {
+  content: "";
+  position: absolute;
+  inset: 28px;
+  border: 4px solid rgba(255, 255, 255, 0.75);
+  border-radius: 28px;
+}
+
+.crowd {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 54px;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.9) 2px, transparent 3px);
+  background-size: 18px 18px;
+  opacity: 0.24;
+}
+
+.crowd-one {
+  top: 0;
+}
+
+.crowd-two {
+  bottom: 0;
+}
+
+.goal-frame {
+  position: absolute;
+  top: 52px;
+  left: 50%;
+  width: 74%;
+  height: 190px;
+  transform: translateX(-50%);
+  border: 12px solid white;
+  border-bottom: 0;
+  border-radius: 22px 22px 8px 8px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.16);
+}
+
+.net-lines {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.34) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.34) 2px, transparent 2px);
+  background-size: 28px 28px;
+}
+
+.keeper-start {
+  position: absolute;
+  top: 218px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+}
+
+/* 골키퍼 */
+
+.keeper {
+  position: absolute;
+  top: 148px;
+  left: 50%;
+  z-index: 6;
+  transform: translateX(-50%);
+  font-size: 64px;
+  transition:
+    left 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(0 12px 12px rgba(0, 0, 0, 0.28));
+}
+
+.keeper-left {
+  left: 20%;
+}
+
+.keeper-center {
+  left: 50%;
+}
+
+.keeper-right {
+  left: 80%;
+}
+
+.keeper-dive.keeper-left {
+  transform: translateX(-50%) rotate(-28deg) scale(1.08);
+}
+
+.keeper-dive.keeper-right {
+  transform: translateX(-50%) rotate(28deg) scale(1.08);
+}
+
+.keeper-dive.keeper-center {
+  transform: translateX(-50%) translateY(-12px) scale(1.08);
+}
+
+/* 공 */
+
+.ball {
+  position: absolute;
+  z-index: 10;
+  bottom: 58px;
+  left: 50%;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 10px 10px rgba(0, 0, 0, 0.28));
+}
+
+.ball-img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.ball-shooting {
+  animation: ballFly 0.76s cubic-bezier(0.16, 0.84, 0.2, 1) forwards;
+}
+
+@keyframes ballFly {
+  0% {
+    left: 50%;
+    bottom: 58px;
+    transform: translateX(-50%) scale(1) rotate(0deg);
+  }
+
+  45% {
+    bottom: 260px;
+    transform: translateX(-50%) scale(0.74) rotate(280deg);
+  }
+
+  100% {
+    left: var(--target-x);
+    bottom: 382px;
+    transform: translateX(-50%) scale(0.48) rotate(720deg);
+  }
+}
+
+/* 페널티 라인 */
+
+.penalty-arc {
+  position: absolute;
+  bottom: -72px;
+  left: 50%;
+  width: 520px;
+  height: 250px;
+  transform: translateX(-50%);
+  border: 5px solid rgba(255, 255, 255, 0.72);
+  border-bottom: 0;
+  border-radius: 520px 520px 0 0;
+}
+
+.spot {
+  position: absolute;
+  bottom: 112px;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: white;
+}
+
+/* 결과 팝업 */
+
+.result-pop {
+  position: absolute;
+  z-index: 20;
+  top: 270px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 16px 30px;
+  border-radius: 999px;
+  background: white;
+  font-size: 36px;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  animation: pop 0.42s ease-out;
+}
+
+.result-pop.goal {
+  color: #16a34a;
+}
+
+.result-pop.save {
+  color: #ef4444;
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.55);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+/* 슛 버튼 */
+
+.controls {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 18px;
+  background: #020617;
+}
+
+.controls button,
+.reset {
+  border: 0;
+  border-radius: 18px;
+  padding: 17px 16px;
+  cursor: pointer;
+  background: white;
+  color: #020617;
+  font-size: 16px;
+  font-weight: 950;
+  transition:
+    transform 0.18s ease,
+    opacity 0.18s ease,
+    background 0.18s ease;
+}
+
+.controls button:hover {
+  transform: translateY(-2px);
+  background: #fef3c7;
+}
+
+.controls button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* 오른쪽 패널 */
+
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.side-panel > div {
+  overflow: visible;
+}
+
+/* 득점 / 라운드 */
+
+.mini-status.side {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.mini-status.side div {
+  padding: 18px 14px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  text-align: center;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+}
+
+.mini-status.side span {
+  display: block;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.mini-status.side strong {
+  display: block;
+  margin-top: 6px;
+  color: #020617;
+  font-size: 28px;
+  font-weight: 950;
+}
+
+/* 슈팅 기록 */
+
+.history {
+  padding: 22px;
+  border-radius: 28px;
+}
+
+.history-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.history h3 {
+  margin: 0;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.history-title span {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.empty {
+  margin: 18px 0 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: #f8fafc;
+  color: #64748b;
+}
+
+.history-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: #f8fafc;
+}
+
+.history-item b {
+  display: block;
+  font-size: 18px;
+  line-height: 1.25;
+}
+
+.history-item small {
+  display: block;
+  margin-top: 5px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.history-item strong {
+  font-size: 18px;
+  font-weight: 950;
+}
+
+.goal-text {
+  color: #16a34a;
+}
+
+.save-text {
+  color: #ef4444;
+}
+
+/* 다시 도전하기 */
+
+.reset {
+  width: 100%;
+  margin-top: 0;
+  border-radius: 20px;
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 14px 36px rgba(239, 68, 68, 0.25);
+}
+
+.reset:hover {
+  transform: translateY(-2px);
+  background: #dc2626;
+}
+
+/* 반응형 */
+
+@media (max-width: 1050px) {
+  .game-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 20px 12px;
+  }
+
+  .field {
+    height: 480px;
+  }
+
+  .controls {
+    grid-template-columns: 1fr;
+  }
+
+  .history {
+    padding: 20px;
+  }
+
+  .history h3 {
+    font-size: 24px;
+  }
+
+  .history-item {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .history-item strong {
+    text-align: left;
+  }
+}
