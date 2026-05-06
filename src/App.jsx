@@ -7,72 +7,85 @@ const ZONES = [
   { id: "right", label: "오른쪽", x: "82%" },
 ];
 
-function pickRandom(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
 export default function App() {
   const [round, setRound] = useState(0);
   const [score, setScore] = useState(0);
-  const [shotZone, setShotZone] = useState(null);
+
+  const [phase, setPhase] = useState("keeper");
+  const [keeperChoice, setKeeperChoice] = useState(null);
   const [keeperZone, setKeeperZone] = useState(null);
+  const [shotZone, setShotZone] = useState(null);
   const [result, setResult] = useState(null);
+
   const [history, setHistory] = useState([]);
   const [isShooting, setIsShooting] = useState(false);
 
   const maxRound = 5;
   const isFinished = round >= maxRound;
 
-  let title = "도전 중";
-  if (isFinished) {
-    if (score === 5) title = "월드컵 영웅";
-    else if (score >= 4) title = "승부차기 장인";
-    else if (score >= 3) title = "국대 후보";
-    else if (score >= 2) title = "동네 메시";
-    else title = "연습이 필요한 선수";
+  function chooseKeeper(zone) {
+    if (isFinished || phase !== "keeper") return;
+
+    setKeeperChoice(zone);
+    setKeeperZone(null);
+    setShotZone(null);
+    setResult(null);
+    setPhase("kicker");
   }
 
   function shoot(zone) {
-    if (isFinished || isShooting) return;
+    if (isFinished || phase !== "kicker" || isShooting || !keeperChoice) return;
 
-    const keeper = pickRandom(ZONES);
-    const isGoal = zone.id !== keeper.id;
+    const isGoal = zone.id !== keeperChoice.id;
 
     setShotZone(zone);
-    setKeeperZone(keeper);
+    setKeeperZone(keeperChoice);
     setResult(null);
     setIsShooting(true);
 
     setTimeout(() => {
       setResult(isGoal ? "goal" : "save");
-
       setScore((prev) => prev + (isGoal ? 1 : 0));
       setRound((prev) => prev + 1);
 
       setHistory((prev) => [
         ...prev,
         {
-        round: prev.length + 1,
-        shot: zone.label,
-        keeper: keeper.label,
-        result: isGoal ? "GOAL" : "SAVE",
+          round: prev.length + 1,
+          shot: zone.label,
+          keeper: keeperChoice.label,
+          result: isGoal ? "GOAL" : "SAVE",
         },
       ]);
 
-      setTimeout(() => {
-        setIsShooting(false);
-      }, 450);
+      setIsShooting(false);
+
+      if (round + 1 >= maxRound) {
+        setPhase("finished");
+      } else {
+        setPhase("result");
+      }
     }, 760);
   }
 
+  function nextRound() {
+    setKeeperChoice(null);
+    setKeeperZone(null);
+    setShotZone(null);
+    setResult(null);
+    setPhase("keeper");
+  }
+
   function resetGame() {
-  setRound(0);
-  setScore(0);
-  setShotZone(null);
-  setKeeperZone(null);
-  setResult(null);
-  setHistory([]);
-  setIsShooting(false);
+    setRound(0);
+    setScore(0);
+    setPhase("keeper");
+    setKeeperChoice(null);
+    setKeeperZone(null);
+    setShotZone(null);
+    setResult(null);
+    setHistory([]);
+    setIsShooting(false);
   }
 
   return (
@@ -81,7 +94,7 @@ export default function App() {
         <div className="stadium-card">
           <div className="stadium-top">
             <span className="live-dot" />
-            <span>LIVE PENALTY SHOOTOUT</span>
+            <span>2 PLAYER PENALTY SHOOTOUT</span>
           </div>
 
           <div className="field">
@@ -93,8 +106,11 @@ export default function App() {
             </div>
 
             <div className="keeper-start">GK</div>
+
             <div
-              className={`keeper ${keeperZone ? `keeper-${keeperZone.id}` : ""} ${isShooting ? "keeper-dive" : ""}`}
+              className={`keeper ${
+                keeperZone ? `keeper-${keeperZone.id}` : ""
+              } ${isShooting ? "keeper-dive" : ""}`}
             >
               🧤
             </div>
@@ -118,17 +134,67 @@ export default function App() {
             )}
           </div>
 
-          <div className="controls">
-            {ZONES.map((zone) => (
-              <button
-                key={zone.id}
-                onClick={() => shoot(zone)}
-                disabled={isFinished || isShooting}
-              >
-                {zone.label}으로 슛
-              </button>
-            ))}
+          <div className="phase-box">
+            {phase === "keeper" && (
+              <p>
+                <b>플레이어 1</b> 골키퍼 방향을 선택하세요.
+              </p>
+            )}
+
+            {phase === "kicker" && (
+              <p>
+                골키퍼 선택 완료! <b>플레이어 2</b>가 슛 방향을 선택하세요.
+              </p>
+            )}
+
+            {phase === "result" && (
+              <p>
+                결과 확인 완료! 다음 라운드로 넘어가세요.
+              </p>
+            )}
+
+            {phase === "finished" && (
+              <p>
+                경기 종료! 최종 득점은 <b>{score}/{maxRound}</b>입니다.
+              </p>
+            )}
           </div>
+
+          {phase === "keeper" && (
+            <div className="controls">
+              {ZONES.map((zone) => (
+                <button key={zone.id} onClick={() => chooseKeeper(zone)}>
+                  {zone.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {phase === "kicker" && (
+            <div className="controls">
+              {ZONES.map((zone) => (
+                <button
+                  key={zone.id}
+                  onClick={() => shoot(zone)}
+                  disabled={isShooting}
+                >
+                  {zone.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {phase === "result" && (
+            <div className="controls one">
+              <button onClick={nextRound}>다음 라운드</button>
+            </div>
+          )}
+
+          {phase === "finished" && (
+            <div className="controls one">
+              <button onClick={resetGame}>처음부터 다시 하기</button>
+            </div>
+          )}
         </div>
 
         <aside className="side-panel">
@@ -139,7 +205,9 @@ export default function App() {
             </div>
             <div>
               <span>라운드</span>
-              <strong>{round}/{maxRound}</strong>
+              <strong>
+                {round}/{maxRound}
+              </strong>
             </div>
           </div>
 
@@ -148,6 +216,7 @@ export default function App() {
               <h3>슈팅 기록</h3>
               <span>{history.length}회</span>
             </div>
+
             {history.length === 0 ? (
               <p className="empty">아직 기록이 없습니다.</p>
             ) : (
@@ -155,9 +224,15 @@ export default function App() {
                 <div className="history-item" key={item.round}>
                   <div>
                     <b>{item.round}차 시도</b>
-                    <small>슛 {item.shot} · 키퍼 {item.keeper}</small>
+                    <small>
+                      슛 {item.shot} · 키퍼 {item.keeper}
+                    </small>
                   </div>
-                  <strong className={item.result === "GOAL" ? "goal-text" : "save-text"}>
+                  <strong
+                    className={
+                      item.result === "GOAL" ? "goal-text" : "save-text"
+                    }
+                  >
                     {item.result}
                   </strong>
                 </div>

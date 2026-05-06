@@ -2,6 +2,16 @@
   box-sizing: border-box;
 }
 
+:root {
+  --game-width: 760px;
+  --side-width: 430px;
+  --card-height: 820px;
+  --top-height: 58px;
+  --field-height: 560px;
+  --phase-height: 76px;
+  --controls-height: 126px;
+}
+
 body {
   margin: 0;
   font-family: Pretendard, Inter, Arial, sans-serif;
@@ -15,7 +25,7 @@ button {
 
 .page {
   min-height: 100vh;
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
   padding: 32px 24px;
   background: #ffffff;
@@ -25,37 +35,67 @@ button {
 
 .game-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 430px;
+  grid-template-columns: var(--game-width) var(--side-width);
   gap: 24px;
+  justify-content: center;
   align-items: start;
 }
+
+/* 공통 카드 */
 
 .stadium-card,
 .side-panel > div {
   border-radius: 32px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+  background: #ffffff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
   overflow: hidden;
+}
+
+/* 왼쪽 게임 카드: 가로/세로 고정 */
+
+.stadium-card {
+  width: var(--game-width);
+  min-width: var(--game-width);
+  max-width: var(--game-width);
+  height: var(--card-height);
+  min-height: var(--card-height);
+  max-height: var(--card-height);
+  display: flex;
+  flex-direction: column;
 }
 
 /* 경기장 상단 */
 
 .stadium-top {
-  height: 58px;
+  width: 100%;
+  height: var(--top-height);
+  min-height: var(--top-height);
+  max-height: var(--top-height);
   padding: 0 22px;
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
   background: #020617;
   color: white;
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.08em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.stadium-top span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .live-dot {
   width: 10px;
   height: 10px;
+  flex-shrink: 0;
   border-radius: 999px;
   background: #ef4444;
   box-shadow: 0 0 0 7px rgba(239, 68, 68, 0.18);
@@ -65,7 +105,11 @@ button {
 
 .field {
   position: relative;
-  height: 560px;
+  width: 100%;
+  height: var(--field-height);
+  min-height: var(--field-height);
+  max-height: var(--field-height);
+  flex-shrink: 0;
   overflow: hidden;
   background:
     linear-gradient(90deg, rgba(255, 255, 255, 0.08) 50%, transparent 50%),
@@ -92,7 +136,11 @@ button {
   left: 0;
   right: 0;
   height: 54px;
-  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.9) 2px, transparent 3px);
+  background-image: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.9) 2px,
+    transparent 3px
+  );
   background-size: 18px 18px;
   opacity: 0.24;
 }
@@ -281,26 +329,78 @@ button {
   }
 }
 
-/* 슛 버튼 */
+/* 단계 안내 */
+
+.phase-box {
+  width: 100%;
+  height: var(--phase-height);
+  min-height: var(--phase-height);
+  max-height: var(--phase-height);
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #f8fafc;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.phase-box p {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  color: #0f172a;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.35;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.phase-box b {
+  color: #dc2626;
+}
+
+/* 선택 버튼 */
 
 .controls {
+  width: 100%;
+  height: var(--controls-height);
+  min-height: var(--controls-height);
+  max-height: var(--controls-height);
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
   gap: 12px;
   padding: 18px;
+  flex-shrink: 0;
+  overflow: hidden;
   background: #020617;
+}
+
+.controls.one {
+  grid-template-columns: 1fr;
 }
 
 .controls button,
 .reset {
+  min-width: 0;
+  height: 62px;
   border: 0;
   border-radius: 18px;
-  padding: 17px 16px;
+  padding: 0 16px;
   cursor: pointer;
   background: white;
   color: #020617;
   font-size: 16px;
   font-weight: 950;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition:
     transform 0.18s ease,
     opacity 0.18s ease,
@@ -321,13 +421,13 @@ button {
 /* 오른쪽 패널 */
 
 .side-panel {
+  width: var(--side-width);
+  min-width: var(--side-width);
+  max-width: var(--side-width);
+  height: var(--card-height);
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.side-panel > div {
-  overflow: visible;
 }
 
 /* 득점 / 라운드 */
@@ -340,6 +440,7 @@ button {
   background: transparent;
   border: none;
   box-shadow: none;
+  overflow: visible;
 }
 
 .mini-status.side div {
@@ -369,8 +470,11 @@ button {
 /* 슈팅 기록 */
 
 .history {
+  flex: 1;
+  min-height: 0;
   padding: 22px;
   border-radius: 28px;
+  overflow-y: auto;
 }
 
 .history-title {
@@ -446,10 +550,24 @@ button {
   color: #ef4444;
 }
 
+.history::-webkit-scrollbar {
+  width: 8px;
+}
+
+.history::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.history::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 /* 다시 도전하기 */
 
 .reset {
   width: 100%;
+  flex-shrink: 0;
   margin-top: 0;
   border-radius: 20px;
   background: #ef4444;
@@ -464,39 +582,95 @@ button {
 
 /* 반응형 */
 
-@media (max-width: 1050px) {
+@media (max-width: 1250px) {
   .game-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .page {
-    padding: 20px 12px;
+    grid-template-columns: var(--game-width);
   }
 
-  .field {
-    height: 480px;
-  }
-
-  .controls {
-    grid-template-columns: 1fr;
+  .side-panel {
+    width: var(--game-width);
+    min-width: var(--game-width);
+    max-width: var(--game-width);
+    height: auto;
+    justify-self: center;
   }
 
   .history {
-    padding: 20px;
+    max-height: 360px;
+  }
+}
+
+@media (max-width: 820px) {
+  :root {
+    --game-width: calc(100vw - 32px);
+    --side-width: calc(100vw - 32px);
   }
 
-  .history h3 {
-    font-size: 24px;
+  .page {
+    padding: 20px 16px;
   }
 
-  .history-item {
-    grid-template-columns: 1fr;
-    text-align: left;
+  .stadium-card {
+    width: var(--game-width);
+    min-width: var(--game-width);
+    max-width: var(--game-width);
   }
 
-  .history-item strong {
-    text-align: left;
+  .controls button,
+  .reset {
+    font-size: 15px;
+    padding: 0 10px;
+  }
+
+  .phase-box p {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 520px) {
+  :root {
+    --card-height: 760px;
+    --field-height: 500px;
+    --controls-height: 126px;
+  }
+
+  .stadium-card {
+    height: var(--card-height);
+    min-height: var(--card-height);
+    max-height: var(--card-height);
+  }
+
+  .field {
+    height: var(--field-height);
+    min-height: var(--field-height);
+    max-height: var(--field-height);
+  }
+
+  .goal-frame {
+    height: 170px;
+  }
+
+  .ball-img {
+    width: 62px;
+    height: 62px;
+  }
+
+  @keyframes ballFly {
+    0% {
+      left: 50%;
+      bottom: 58px;
+      transform: translateX(-50%) scale(1) rotate(0deg);
+    }
+
+    45% {
+      bottom: 230px;
+      transform: translateX(-50%) scale(0.74) rotate(280deg);
+    }
+
+    100% {
+      left: var(--target-x);
+      bottom: 340px;
+      transform: translateX(-50%) scale(0.48) rotate(720deg);
+    }
   }
 }
