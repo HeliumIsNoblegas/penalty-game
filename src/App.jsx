@@ -20,7 +20,7 @@ export default function App() {
   const [history, setHistory] = useState([]);
   const [isShooting, setIsShooting] = useState(false);
 
-  const maxRound = 5;
+  const maxRound = 4;
   const isFinished = round >= maxRound;
 
   function chooseKeeper(zone) {
